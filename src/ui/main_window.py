@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QWidget, QLabel, QPushButton, QVBoxLayout
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
 
 class MainWindow(QWidget):

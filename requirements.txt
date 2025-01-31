@@ -1,5 +1,12 @@
+black==25.1.0
+click==8.1.8
 comtypes==1.4.9
+isort==6.0.0
 keyboard==0.13.5
+mypy-extensions==1.0.0
+packaging==24.2
+pathspec==0.12.1
+platformdirs==4.3.6
 psutil==6.1.1
 pycaw==20240210
 pynput==1.7.7
@@ -160,6 +167,7 @@ pyobjc-framework-VideoToolbox==11.0
 pyobjc-framework-Virtualization==11.0
 pyobjc-framework-Vision==11.0
 pyobjc-framework-WebKit==11.0
+PyQt6==6.8.0
+PyQt6-Qt6==6.8.1
+PyQt6_sip==13.9.1
 six==1.17.0
-
-PyQt6~=6.8.0
