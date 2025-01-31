@@ -16,7 +16,7 @@ class Application:
     def run(self):
         if self.system:
             app = QApplication(sys.argv)
-            window = Window(system=self.system, settings=self.settings)
+            window = Window(system=self.system, settings=self.settings, application=self)
             window.show()
             sys.exit(app.exec())
         else:
@@ -32,3 +32,6 @@ class Application:
             return MacOS()
         else:
             return None
+
+    def recognize_devices(self):
+        return self.system.recognize_devices()
