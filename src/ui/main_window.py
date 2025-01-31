@@ -1,7 +1,16 @@
 import os
 
 from PyQt6.QtCore import QRect
-from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QComboBox
+from PyQt6.QtWidgets import (
+    QVBoxLayout,
+    QHBoxLayout,
+    QWidget,
+    QComboBox,
+    QPushButton,
+    QListWidget,
+    QListWidgetItem,
+    QLabel,
+)
 
 os.environ["QT_FONT_DPI"] = "96"
 
@@ -36,10 +45,14 @@ class Window(QWidget):
         self.navbar_widget.setLayout(self.navbar)
 
         self.device_select = QComboBox()
-        self.device_select.addItems(self.application.recognize_devices())
+        self.device_select.addItems(self.recognized_devices)
         self.device_select.currentIndexChanged.connect(self.on_select_device)
 
+        self.refresh_device_select_button = QPushButton("Odśwież")
+        self.refresh_device_select_button.clicked.connect(self.refresh_device_list)
+
         self.navbar.addWidget(self.device_select)
+        self.navbar.addWidget(self.refresh_device_select_button)
         self.main_layout.addWidget(self.navbar_widget)
 
         self.main_layout.addSpacing(5)
@@ -51,7 +64,39 @@ class Window(QWidget):
         self.content_layout.setContentsMargins(10, 10, 10, 10)
         self.content_widget.setLayout(self.content_layout)
 
+        self.macro_list = QListWidget()
+
+        self.content_layout.addWidget(self.macro_list)
+        self.macros = ["F1", "F2"]
+        self.populate_macro_list()
+
         self.main_layout.addWidget(self.content_widget, 1)
+
+    def populate_macro_list(self):
+        for macro in self.macros:
+            item = QListWidgetItem(self.macro_list)
+            item_widget = QWidget()
+
+            layout = QHBoxLayout()
+            layout.setContentsMargins(5, 5, 5, 5)
+
+            key_label = QLabel(macro)
+
+            function_select = QComboBox()
+            function_select.addItem("Wybierz funkcję")
+
+            layout.addWidget(key_label)
+            layout.addWidget(function_select)
+            item_widget.setLayout(layout)
+
+            item.setSizeHint(item_widget.sizeHint())
+            self.macro_list.addItem(item)
+            self.macro_list.setItemWidget(item, item_widget)
+
+    def refresh_device_list(self):
+        self.recognized_devices = self.application.recognize_devices()
+        self.device_select.clear()
+        self.device_select.addItems(self.recognized_devices)
 
     def on_select_device(self):
         selected_text = self.device_select.currentText()
