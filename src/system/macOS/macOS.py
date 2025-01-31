@@ -8,11 +8,16 @@ class MacOS(System):
         super().__init__(name="MacOS")
 
     def recognize_devices(self):
-        devices = {
-            "USB": self.get_usb_devices(),
-            "Bluetooth": self.get_bluetooth_devices(),
-            "Klawiatura": self.get_builtin_keyboard(),
-        }
+        devices = [self.get_builtin_keyboard()]
+
+        usb_devices = self.get_usb_devices()
+        bluetooth_devices = self.get_bluetooth_devices()
+
+        for usb in usb_devices:
+            devices.append(usb)
+        for bluetooth in bluetooth_devices:
+            devices.append(bluetooth)
+
         return devices
 
     def get_usb_devices(self):
@@ -36,4 +41,4 @@ class MacOS(System):
     def get_builtin_keyboard(self):
         result = subprocess.getoutput("ioreg -r -c AppleEmbeddedKeyboard")
 
-        return ["Wbudowana klawiatura"] if result else []
+        return "Wbudowana klawiatura" if result else None

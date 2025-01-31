@@ -1,6 +1,7 @@
 import os
 
-from PyQt6.QtWidgets import QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QListWidget
+from PyQt6.QtCore import QRect
+from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QComboBox
 
 os.environ["QT_FONT_DPI"] = "96"
 
@@ -17,48 +18,41 @@ class Window(QWidget):
         self.setGeometry(*settings["APP_GEOMETRY"])
         self.setStyleSheet(open("src/ui/themes/py_dracula_dark.qss", "r").read())
 
-        self.main_layout = QHBoxLayout()
+        self.recognized_devices = []
+        self.current_device = None
+
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
-        self.render_sidebar()
+        # Navbar
+        self.navbar = QHBoxLayout()
+        self.navbar.setContentsMargins(0, 10, 0, 0)
+        self.navbar.setSpacing(10)
+        self.navbar.setGeometry(QRect(0, 0, 800, 120))
 
-        self.device_list = QListWidget()
-        self.device_list.itemClicked.connect(self.on_device_click)
-        self.main_layout.addWidget(self.device_list, 1)
+        self.navbar_widget = QWidget()
+        self.navbar_widget.setLayout(self.navbar)
 
-    def render_sidebar(self):
-        sidebar = QVBoxLayout()
-        sidebar.setContentsMargins(0, 0, 0, 0)
-        sidebar.setSpacing(20)
+        self.device_select = QComboBox()
+        self.device_select.addItems(self.application.recognize_devices())
+        self.device_select.currentIndexChanged.connect(self.on_select_device)
 
-        sidebar_widget = QWidget()
-        sidebar_widget.setLayout(sidebar)
-        sidebar_widget.setFixedWidth(150)
+        self.navbar.addWidget(self.device_select)
+        self.main_layout.addWidget(self.navbar_widget)
 
-        devices_button = QPushButton("Urządzenia")
-        devices_button.clicked.connect(self.show_devices)
+        self.main_layout.addSpacing(5)
 
-        info_button = QPushButton("Informacje")
+        # Main
+        self.content_widget = QWidget(self)
+        self.content_widget.setStyleSheet("background-color: #222;")
+        self.content_layout = QVBoxLayout()
+        self.content_layout.setContentsMargins(10, 10, 10, 10)
+        self.content_widget.setLayout(self.content_layout)
 
-        sidebar.addWidget(devices_button)
-        sidebar.addWidget(info_button)
-        sidebar.addStretch()
+        self.main_layout.addWidget(self.content_widget, 1)
 
-        self.main_layout.addWidget(sidebar_widget)
-
-    def show_devices(self):
-        self.device_list.clear()
-
-        if hasattr(self.system, "recognize_devices"):
-            print("Wykrywanie urządzeń...")
-            devices = self.system.recognize_devices()
-
-            for category, device_list in devices.items():
-                if device_list:
-                    for device in device_list:
-                        self.device_list.addItem(device)
-        else:
-            self.device_list.addItem("Funkcja nie jest dostępna dla tego systemu.")
-
-    def on_device_click(self, item):
-        print(f"Kliknięto na: {item.text()}")
+    def on_select_device(self):
+        selected_text = self.device_select.currentText()
+        print(selected_text)
