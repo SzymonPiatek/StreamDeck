@@ -1,34 +1,42 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
+from PyQt6.QtWidgets import QPushButton, QVBoxLayout, QHBoxLayout, QWidget
 
 
-class MainWindow(QWidget):
-    def __init__(self, system):
+class Window(QWidget):
+    def __init__(self, system, settings):
         super().__init__()
+
         self.system = system
+        self.settings = settings
 
-        self.setWindowTitle("Stream Deck - PyDracula")
-        self.setGeometry(100, 100, 400, 300)
-        self.setStyleSheet(open("src/ui/pydracula_style.qss", "r").read())
+        self.setWindowTitle(f"{settings["APP_NAME"]} {self.system.name}")
+        self.setGeometry(*settings["APP_GEOMETRY"])
+        self.setStyleSheet(open("src/ui/themes/py_dracula_dark.qss", "r").read())
 
-        layout = QVBoxLayout()
+        # Layout
+        main_layout = QHBoxLayout()
 
-        self.label = QLabel(f"System wykryty: {self.system.name if self.system else 'Nieznany'}")
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(self.label)
+        sidebar = QVBoxLayout()
 
-        self.button = QPushButton("Wykonaj akcję")
-        self.button.clicked.connect(self.perform_action)
-        layout.addWidget(self.button)
+        self.devices_button = QPushButton("Urządzenia")
+        sidebar.addWidget(self.devices_button)
 
-        self.quit_button = QPushButton("Zamknij")
-        self.quit_button.clicked.connect(self.close)
-        layout.addWidget(self.quit_button)
+        self.info_button = QPushButton("Informacje")
+        sidebar.addWidget(self.info_button)
 
-        self.setLayout(layout)
+        sidebar.addStretch()
+
+        sidebar_widget = QWidget()
+        sidebar_widget.setLayout(sidebar)
+        sidebar_widget.setFixedWidth(200)
+
+        content = QWidget()
+        content.setStyleSheet("background-color: #1E1E1E; border-radius: 10px;")
+
+        # 🔹 Układ główny
+        main_layout.addWidget(sidebar_widget)
+        main_layout.addWidget(content, 1)
+
+        self.setLayout(main_layout)
 
     def perform_action(self):
-        if self.system:
-            self.system.event_listener()
-        else:
-            print("Brak obsługi dla tego systemu.")
+        self.system.event_listener()
