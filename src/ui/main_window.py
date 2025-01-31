@@ -1,3 +1,4 @@
+import json
 import os
 
 from PyQt6.QtCore import QRect
@@ -23,20 +24,21 @@ class Window(QWidget):
         self.system = system
         self.settings = settings
         self.application = application
+        self.config_file = "src/data/config.json"
 
-        self.setWindowTitle(f"{settings["APP_NAME"]} {self.system.name}")
+        self.setWindowTitle(f"{settings['APP_NAME']} {self.system.name}")
         self.setGeometry(*settings["APP_GEOMETRY"])
         self.setStyleSheet(open("src/ui/themes/py_dracula_dark.qss", "r").read())
 
         self.recognized_devices = []
         self.current_device = None
+        self.macros = []
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
-        # Navbar
         self.navbar = QHBoxLayout()
         self.navbar.setContentsMargins(10, 10, 10, 10)
         self.navbar.setSpacing(10)
@@ -46,9 +48,8 @@ class Window(QWidget):
         self.navbar_widget.setLayout(self.navbar)
 
         self.device_select = QComboBox()
-        self.device_select.addItems(self.recognized_devices)
-        self.device_select.currentIndexChanged.connect(self.on_select_device)
         self.device_select.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        self.device_select.currentIndexChanged.connect(self.on_select_device)
 
         self.refresh_device_select_button = QPushButton("Odśwież")
         self.refresh_device_select_button.clicked.connect(self.refresh_device_list)
@@ -63,7 +64,6 @@ class Window(QWidget):
 
         self.main_layout.addSpacing(5)
 
-        # Main
         self.content_widget = QWidget(self)
         self.content_widget.setStyleSheet("background-color: #222;")
         self.content_layout = QVBoxLayout()
@@ -71,14 +71,46 @@ class Window(QWidget):
         self.content_widget.setLayout(self.content_layout)
 
         self.macro_list = QListWidget()
-
         self.content_layout.addWidget(self.macro_list)
-        self.macros = ["F1", "F2"]
-        self.populate_macro_list()
-
         self.main_layout.addWidget(self.content_widget, 1)
 
+        self.ensure_config_file_exists()
+        self.load_config()
+        self.refresh_device_list()
+
+    def ensure_config_file_exists(self):
+        if not os.path.exists(self.config_file) or os.stat(self.config_file).st_size == 0:
+            with open(self.config_file, "w", encoding="utf-8") as f:
+                json.dump([], f, indent=4, ensure_ascii=False)
+
+    def refresh_device_list(self):
+        self.recognized_devices = self.application.recognize_devices()
+        self.device_select.clear()
+        self.device_select.addItems(self.recognized_devices)
+
+        try:
+            with open(self.config_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = []
+
+        existing_devices = {d["device"] for d in data}
+
+        for device in self.recognized_devices:
+            if device not in existing_devices:
+                data.append({"device": device, "macros": []})
+
+        self.save_json(data)
+
+    def on_select_device(self):
+        selected_device = self.device_select.currentText()
+        self.current_device = selected_device
+        self.macros = self.load_macros_for_device(selected_device)
+        self.populate_macro_list()
+
     def populate_macro_list(self):
+        self.macro_list.clear()
+
         for macro in self.macros:
             item = QListWidgetItem(self.macro_list)
             item_widget = QWidget()
@@ -86,10 +118,16 @@ class Window(QWidget):
             layout = QHBoxLayout()
             layout.setContentsMargins(5, 5, 5, 5)
 
-            key_label = QLabel(macro)
+            key_label = QLabel(macro["key"])
 
             function_select = QComboBox()
-            function_select.addItem("Wybierz funkcję")
+            for function in self.settings["MACRO_FUNCTIONS"]:
+                function_select.addItem(function)
+
+            function_select.setCurrentText(macro.get("function", "Wybierz funkcję"))
+            function_select.currentIndexChanged.connect(
+                lambda _, k=macro["key"], f=function_select: self.save_macro(k, f.currentText())
+            )
 
             layout.addWidget(key_label)
             layout.addWidget(function_select)
@@ -99,11 +137,74 @@ class Window(QWidget):
             self.macro_list.addItem(item)
             self.macro_list.setItemWidget(item, item_widget)
 
-    def refresh_device_list(self):
-        self.recognized_devices = self.application.recognize_devices()
-        self.device_select.clear()
-        self.device_select.addItems(self.recognized_devices)
+    def save_macro(self, key, function):
+        if not self.current_device:
+            return
 
-    def on_select_device(self):
-        selected_text = self.device_select.currentText()
-        print(selected_text)
+        try:
+            with open(self.config_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = []
+
+        for entry in data:
+            if entry["device"] == self.current_device:
+                for macro in entry["macros"]:
+                    if macro["key"] == key:
+                        macro["function"] = function
+                        break
+                else:
+                    entry["macros"].append({"key": key, "function": function})
+                break
+
+        self.save_json(data)
+
+    def load_macros_for_device(self, device):
+        try:
+            with open(self.config_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            if isinstance(data, dict):
+                data = [{"device": key, "macros": value} for key, value in data.items()]
+                self.save_json(data)
+
+            if not isinstance(data, list):
+                return []
+
+            for entry in data:
+                if isinstance(entry, dict) and "device" in entry and entry["device"] == device:
+                    return entry.get("macros", [])
+
+        except (FileNotFoundError, json.JSONDecodeError):
+            return []
+
+        return []
+
+    def save_config(self):
+        try:
+            with open(self.config_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            if isinstance(data, dict):
+                data = [{"device": key, "macros": value} for key, value in data.items()]
+
+        except (FileNotFoundError, json.JSONDecodeError):
+            data = []
+
+        device_entry = next((d for d in data if d["device"] == self.current_device), None)
+
+        if device_entry:
+            device_entry["macros"] = self.macros
+        else:
+            data.append({"device": self.current_device, "macros": self.macros})
+
+        self.save_json(data)
+
+    def load_config(self):
+        if not os.path.exists(self.config_file):
+            with open(self.config_file, "w", encoding="utf-8") as f:
+                json.dump([], f)
+
+    def save_json(self, data):
+        with open(self.config_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)

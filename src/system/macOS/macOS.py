@@ -39,6 +39,11 @@ class MacOS(System):
         return devices if devices else []
 
     def get_builtin_keyboard(self):
-        result = subprocess.getoutput("ioreg -r -c AppleEmbeddedKeyboard")
+        result = subprocess.getoutput("ioreg -r -c AppleEmbeddedKeyboard -d 1 | grep -i 'Product'")
 
-        return "Wbudowana klawiatura" if result else None
+        if result:
+            parts = result.split("=")
+            if len(parts) > 1:
+                return parts[1].strip().replace('"', "")  # Usunięcie cudzysłowów
+
+        return None
