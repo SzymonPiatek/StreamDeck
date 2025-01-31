@@ -44,6 +44,52 @@ class MacOS(System):
         if result:
             parts = result.split("=")
             if len(parts) > 1:
-                return parts[1].strip().replace('"', "")  # Usunięcie cudzysłowów
+                return parts[1].strip().replace('"', "")
 
         return None
+
+    def volume_down(self):
+        try:
+            subprocess.run(
+                [
+                    "osascript",
+                    "-e",
+                    "set volume output volume (output volume of (get volume settings) - 10) --100 max",
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"DEBUG: Błąd zmniejszania głośności: {e}")
+
+    def volume_up(self):
+        try:
+            subprocess.run(
+                [
+                    "osascript",
+                    "-e",
+                    "set volume output volume (output volume of (get volume settings) + 10) --100 max",
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"DEBUG: Błąd zwiększania głośności: {e}")
+
+    def mute_unmute(self):
+        try:
+            subprocess.run(
+                [
+                    "osascript",
+                    "-e",
+                    """
+                    set currentMute to output muted of (get volume settings)
+                    if currentMute then
+                        set volume output muted false
+                    else
+                        set volume output muted true
+                    end if
+                    """,
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"DEBUG: Błąd wyciszania: {e}")

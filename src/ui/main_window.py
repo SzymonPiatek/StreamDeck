@@ -1,6 +1,8 @@
 import json
 import os
+import threading
 
+import keyboard
 from PyQt6.QtCore import QRect
 from PyQt6.QtWidgets import (
     QVBoxLayout,
@@ -33,6 +35,7 @@ class Window(QWidget):
         self.recognized_devices = []
         self.current_device = None
         self.macros = []
+        self.listener_thread = None
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -77,6 +80,34 @@ class Window(QWidget):
         self.ensure_config_file_exists()
         self.load_config()
         self.refresh_device_list()
+        self.start_keyboard_listener()
+
+    def on_key_press(self, event):
+        key_name = event.name
+        print(f"DEBUG: Wykryto naciśnięcie klawisza: {key_name}")
+
+        for macro in self.macros:
+            if macro["key"] == key_name:
+                self.execute_macro(macro["function"])
+
+    def execute_macro(self, function):
+        if function == "Volume -":
+            self.system.volume_down()
+        elif function == "Volume +":
+            self.system.volume_up()
+        elif function == "Mute/unmute":
+            self.system.mute_unmute()
+
+    def start_keyboard_listener(self):
+        self.listener_thread = threading.Thread(target=self.listen_for_keys, daemon=True)
+        self.listener_thread.start()
+
+    def listen_for_keys(self):
+        try:
+            keyboard.on_press(self.on_key_press)
+            keyboard.wait()
+        except Exception as e:
+            print(f"DEBUG: Błąd podczas nasłuchiwania klawiszy: {e}")
 
     def ensure_config_file_exists(self):
         if not os.path.exists(self.config_file) or os.stat(self.config_file).st_size == 0:
@@ -163,48 +194,26 @@ class Window(QWidget):
         try:
             with open(self.config_file, "r", encoding="utf-8") as f:
                 data = json.load(f)
-
-            if isinstance(data, dict):
-                data = [{"device": key, "macros": value} for key, value in data.items()]
-                self.save_json(data)
-
             if not isinstance(data, list):
                 return []
-
             for entry in data:
-                if isinstance(entry, dict) and "device" in entry and entry["device"] == device:
+                if entry["device"] == device:
                     return entry.get("macros", [])
-
         except (FileNotFoundError, json.JSONDecodeError):
             return []
-
         return []
-
-    def save_config(self):
-        try:
-            with open(self.config_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-
-            if isinstance(data, dict):
-                data = [{"device": key, "macros": value} for key, value in data.items()]
-
-        except (FileNotFoundError, json.JSONDecodeError):
-            data = []
-
-        device_entry = next((d for d in data if d["device"] == self.current_device), None)
-
-        if device_entry:
-            device_entry["macros"] = self.macros
-        else:
-            data.append({"device": self.current_device, "macros": self.macros})
-
-        self.save_json(data)
-
-    def load_config(self):
-        if not os.path.exists(self.config_file):
-            with open(self.config_file, "w", encoding="utf-8") as f:
-                json.dump([], f)
 
     def save_json(self, data):
         with open(self.config_file, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
+
+    def load_config(self):
+        try:
+            with open(self.config_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, list):
+                return []
+        except (FileNotFoundError, json.JSONDecodeError):
+            return []
+
+        return data

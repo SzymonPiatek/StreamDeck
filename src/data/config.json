@@ -3,12 +3,12 @@
         "device": "Apple Internal Keyboard / Trackpad\n      ProductID",
         "macros": [
             {
-                "key": "F1",
-                "function": "Mute/Unmute"
+                "key": "ctrl",
+                "function": "Volume +"
             },
             {
-                "key": "F2",
-                "function": "Volume +"
+                "key": "alt",
+                "function": "Volume -"
             }
         ]
     }
