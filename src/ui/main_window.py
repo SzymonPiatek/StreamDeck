@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QListWidget,
     QListWidgetItem,
     QLabel,
+    QSizePolicy,
 )
 
 os.environ["QT_FONT_DPI"] = "96"
@@ -37,7 +38,7 @@ class Window(QWidget):
 
         # Navbar
         self.navbar = QHBoxLayout()
-        self.navbar.setContentsMargins(0, 10, 0, 0)
+        self.navbar.setContentsMargins(10, 10, 10, 10)
         self.navbar.setSpacing(10)
         self.navbar.setGeometry(QRect(0, 0, 800, 120))
 
@@ -47,9 +48,14 @@ class Window(QWidget):
         self.device_select = QComboBox()
         self.device_select.addItems(self.recognized_devices)
         self.device_select.currentIndexChanged.connect(self.on_select_device)
+        self.device_select.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
 
         self.refresh_device_select_button = QPushButton("Odśwież")
         self.refresh_device_select_button.clicked.connect(self.refresh_device_list)
+        self.refresh_device_select_button.setSizePolicy(
+            QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred
+        )
+        self.refresh_device_select_button.setMinimumHeight(30)
 
         self.navbar.addWidget(self.device_select)
         self.navbar.addWidget(self.refresh_device_select_button)
