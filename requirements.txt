@@ -161,3 +161,5 @@ pyobjc-framework-Virtualization==11.0
 pyobjc-framework-Vision==11.0
 pyobjc-framework-WebKit==11.0
 six==1.17.0
+
+PyQt6~=6.8.0

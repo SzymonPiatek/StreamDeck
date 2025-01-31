@@ -1,6 +1,11 @@
 import platform
+import sys
+
+from PyQt6.QtWidgets import QApplication
+
 from src.system.macOS.macOS import MacOS
 from src.system.windows.windows import Windows
+from src.ui.main_window import MainWindow
 
 
 class Application:
@@ -9,13 +14,10 @@ class Application:
         self.system = self.recognize_system()
 
     def run(self):
-        if not self.system:
-            print("Nieobsługiwany system operacyjny!")
-            return
-
-        running = True
-        while running:
-            self.system.event_listener()
+        app = QApplication(sys.argv)
+        window = MainWindow(self.system)
+        window.show()
+        sys.exit(app.exec())
 
     def recognize_system(self):
         system_name = platform.system()
