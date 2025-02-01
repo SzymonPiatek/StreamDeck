@@ -12,11 +12,12 @@ class Application:
     def __init__(self, settings):
         self.settings = settings
         self.system = self.recognize_system()
+        self.config_file = "src/data/config.json"
 
     def run(self):
         if self.system:
             app = QApplication(sys.argv)
-            window = Window(system=self.system, settings=self.settings, application=self)
+            window = Window(application=self)
             window.show()
             sys.exit(app.exec())
         else:
@@ -32,6 +33,3 @@ class Application:
             return MacOS()
         else:
             return None
-
-    def recognize_devices(self):
-        return self.system.recognize_devices()

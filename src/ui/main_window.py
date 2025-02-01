@@ -20,16 +20,16 @@ os.environ["QT_FONT_DPI"] = "96"
 
 
 class Window(QWidget):
-    def __init__(self, system, settings, application):
+    def __init__(self, application):
         super().__init__()
 
-        self.system = system
-        self.settings = settings
         self.application = application
-        self.config_file = "src/data/config.json"
+        self.system = self.application.system
+        self.settings = self.application.settings
+        self.config_file = self.application.config_file
 
-        self.setWindowTitle(f"{settings['APP_NAME']} {self.system.name}")
-        self.setGeometry(*settings["APP_GEOMETRY"])
+        self.setWindowTitle(f"{self.settings['APP_NAME']} {self.system.name}")
+        self.setGeometry(*self.settings["APP_GEOMETRY"])
         self.setStyleSheet(open("src/ui/themes/py_dracula_dark.qss", "r").read())
 
         self.recognized_devices = []
@@ -115,7 +115,7 @@ class Window(QWidget):
                 json.dump([], f, indent=4, ensure_ascii=False)
 
     def refresh_device_list(self):
-        self.recognized_devices = self.application.recognize_devices()
+        self.recognized_devices = self.system.recognize_devices()
         self.device_select.clear()
         self.device_select.addItems(self.recognized_devices)
 
