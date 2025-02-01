@@ -1,0 +1,35 @@
+QPushButton {
+    background-color: #444;
+    color: white;
+    font-size: 12px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    border: 1px solid #555;
+}
+
+QPushButton:hover {
+    background-color: #555;
+}
+
+QPushButton:pressed {
+    background-color: #666;
+}
+
+QComboBox {
+    background-color: #333;
+    color: white;
+    font-size: 12px;
+    padding: 6px;
+    border: 1px solid #555;
+    border-radius: 5px;
+}
+QComboBox::drop-down {
+    width: 20px;
+    border-left: 1px solid #555;
+    background-color: #444;
+}
+QComboBox QAbstractItemView {
+    background-color: #222;
+    color: white;
+    selection-background-color: #555;
+}
