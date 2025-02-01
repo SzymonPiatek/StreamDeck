@@ -4,7 +4,7 @@
     "macros": [
       {
         "key": "ctrl",
-        "function": "Volume +"
+        "function": "Mute/Unmute"
       }
     ]
   }

@@ -69,7 +69,7 @@ class Application:
                     entry["macros"].append({"key": key, "function": function})
                 break
 
-        self.device_config.save_file(data)
+        self.device_config.save_file(data=data)
 
     def execute_macro(self, function):
         if function == "Volume -":

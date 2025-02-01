@@ -33,6 +33,7 @@ class Window(QWidget):
         self.main_layout.setSpacing(0)
         self.setLayout(self.main_layout)
 
+        # Navbar
         self.navbar = QHBoxLayout()
         self.navbar.setContentsMargins(10, 10, 10, 10)
         self.navbar.setSpacing(10)
@@ -58,6 +59,7 @@ class Window(QWidget):
 
         self.main_layout.addSpacing(5)
 
+        # Macro list
         self.content_widget = QWidget(self)
         self.content_widget.setStyleSheet("background-color: #222;")
         self.content_layout = QVBoxLayout()
@@ -109,8 +111,9 @@ class Window(QWidget):
                 function_select.addItem(function)
 
             function_select.setCurrentText(macro.get("function", "Wybierz funkcję"))
+
             function_select.currentIndexChanged.connect(
-                lambda _, k=macro["key"], f=function_select: self.application.save_macro(
+                lambda _, k=macro["key"], f=function_select: self.on_macro_change(
                     k, f.currentText()
                 )
             )
@@ -122,3 +125,9 @@ class Window(QWidget):
             item.setSizeHint(item_widget.sizeHint())
             self.macro_list.addItem(item)
             self.macro_list.setItemWidget(item, item_widget)
+
+    def on_macro_change(self, key, function):
+        self.application.save_macro(key, function)
+        self.application.macros = self.application.load_macros_for_device(
+            self.application.current_device
+        )
