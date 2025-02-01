@@ -1,15 +1,6 @@
 [
     {
-        "device": "Apple Internal Keyboard / Trackpad\n      ProductID",
-        "macros": [
-            {
-                "key": "ctrl",
-                "function": "Volume +"
-            },
-            {
-                "key": "alt",
-                "function": "Volume -"
-            }
-        ]
+        "device": " Apple Internal Keyboard / Trackpad",
+        "macros": []
     }
 ]

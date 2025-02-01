@@ -44,7 +44,8 @@ class MacOS(System):
         if result:
             parts = result.split("=")
             if len(parts) > 1:
-                return parts[1].strip().replace('"', "")
+                name = parts[1].split("\n")
+                return name[0].replace('"', "")
 
         return None
 
