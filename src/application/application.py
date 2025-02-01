@@ -76,7 +76,7 @@ class Application:
             self.system.volume_down()
         elif function == "Volume +":
             self.system.volume_up()
-        elif function == "Mute/unmute":
+        elif function == "Mute/Unmute":
             self.system.mute_unmute()
 
     def on_key_press(self, event):
