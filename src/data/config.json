@@ -1,6 +1,11 @@
 [
-    {
-        "device": " Apple Internal Keyboard / Trackpad",
-        "macros": []
-    }
+  {
+    "device": " Apple Internal Keyboard / Trackpad",
+    "macros": [
+      {
+        "key": "ctrl",
+        "function": "Volume +"
+      }
+    ]
+  }
 ]

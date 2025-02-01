@@ -1,11 +1,15 @@
 import subprocess
 
+import keyboard
+
 from src.system.system.system import System
 
 
 class MacOS(System):
-    def __init__(self):
+    def __init__(self, application):
         super().__init__(name="MacOS")
+
+        self.application = application
 
     def recognize_devices(self):
         devices = [self.get_builtin_keyboard()]
@@ -94,3 +98,10 @@ class MacOS(System):
             )
         except subprocess.CalledProcessError as e:
             print(f"DEBUG: Błąd wyciszania: {e}")
+
+    def device_listener(self):
+        try:
+            keyboard.on_press(self.application.on_key_press)
+            keyboard.wait()
+        except Exception as e:
+            print(f"DEBUG: Błąd podczas nasłuchiwania klawiszy: {e}")
