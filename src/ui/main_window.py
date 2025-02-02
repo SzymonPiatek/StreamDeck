@@ -72,22 +72,29 @@ class Window(QWidget):
     def refresh_device_list(self):
         self.application.recognized_devices = self.application.system.recognize_devices()
         self.device_select.clear()
-        self.device_select.addItems(self.application.recognized_devices)
+        self.device_select.addItems([device.name for device in self.application.recognized_devices])
 
         data = self.application.load_device_config()
 
-        existing_devices = {d["device"] for d in data}
+        serializable_data = []
 
         for device in self.application.recognized_devices:
-            if device not in existing_devices:
-                data.append({"device": device, "macros": []})
+            print(device)
+            device_dict = {
+                "device": device.name,
+                "device_id": device.id,
+                "device_type": device.type,
+                "macros": next((entry["macros"] for entry in data if entry["device"] == device.name), []),
+            }
 
-        self.application.device_config.save_file(data)
+            serializable_data.append(device_dict)
+
+        self.application.device_config.save_file(serializable_data)
 
     def on_select_device(self):
         selected_device = self.device_select.currentText()
         self.application.current_device = selected_device
-        self.application.macros = self.application.load_macros_for_device(selected_device)
+        self.application.macros = self.application.load_macros_for_device(selected_device) or []
         self.populate_macro_list()
 
     def populate_macro_list(self):

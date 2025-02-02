@@ -4,7 +4,7 @@ import threading
 
 from PyQt6.QtWidgets import QApplication
 
-from src.application.file.file import JSONFile
+from src.file.file import JSONFile
 from src.system.macOS.macOS import MacOS
 from src.system.windows.windows import Windows
 from src.ui.main_window import Window
@@ -51,7 +51,7 @@ class Application:
         for entry in data:
             if entry["device"] == device:
                 return entry.get("macros", [])
-            return []
+        return []
 
     def save_macro(self, key, function):
         if not self.current_device:

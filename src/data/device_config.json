@@ -1,10 +1,12 @@
 [
   {
-    "device": " Apple Internal Keyboard / Trackpad",
+    "device": "Apple Internal Keyboard / Trackpad",
+    "device_id": null,
+    "device_type": "Builtin",
     "macros": [
       {
         "key": "ctrl",
-        "function": "Next track spotify"
+        "function": "Toggle music"
       }
     ]
   }

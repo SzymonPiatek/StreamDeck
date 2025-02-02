@@ -1,8 +1,10 @@
 import functools
+import re
 import subprocess
 
 import keyboard
 
+from src.device.device import Device
 from src.system.system.system import System
 
 
@@ -46,16 +48,32 @@ class MacOS(System):
         usb_devices = self.get_usb_devices()
         bluetooth_devices = self.get_bluetooth_devices()
 
-        for usb in usb_devices:
-            devices.append(usb)
-        for bluetooth in bluetooth_devices:
-            devices.append(bluetooth)
+        devices.extend(usb_devices)
+        devices.extend(bluetooth_devices)
 
         return devices
 
     def get_usb_devices(self):
         result = subprocess.getoutput("system_profiler SPUSBDataType")
-        devices = [line.strip() for line in result.split("\n") if "Product Name:" in line]
+        devices = []
+
+        current_device = None
+
+        for line in result.split("\n"):
+            line = line.strip()
+
+            if line.startswith("Product Name:"):
+                device_name = line.split(":")[1].strip()
+                current_device = Device(name=device_name, device_type="USB")
+
+            elif line.startswith("Product ID:") and current_device:
+                match = re.search(r"Product ID: 0x(\w+)", line)
+                if match:
+                    current_device.device_id = int(match.group(1), 16)
+
+            if current_device and current_device.name:
+                devices.append(current_device)
+                current_device = None
 
         return devices
 
@@ -63,23 +81,48 @@ class MacOS(System):
         result = subprocess.getoutput("system_profiler SPBluetoothDataType")
         devices = []
 
+        current_device = None
         prev_line = None
+
         for line in result.split("\n"):
-            if "Connected: Yes" in line:
-                devices.append(prev_line.strip())
+            line = line.strip()
+
+            if "Connected: Yes" in line and prev_line:
+                device_name = prev_line.strip()
+                current_device = Device(name=device_name, device_type="Bluetooth")
+
+            if current_device:
+                devices.append(current_device)
+                current_device = None
+
             prev_line = line
 
-        return devices if devices else []
+        return devices
 
     def get_builtin_keyboard(self):
         result = subprocess.getoutput("ioreg -r -c AppleEmbeddedKeyboard -d 1 | grep -i 'Product'")
 
         if result:
-            parts = result.split("=")
-            if len(parts) > 1:
-                name = parts[1].split("\n")
-                return name[0].replace('"', "")
+            device_name = None
+            device_id = None
+            device_type = "Builtin"
 
+            for line in result.split("\n"):
+                line = line.strip()
+
+                if line.startswith('"Product"'):
+                    match = re.search(r'"Product" = "(.*?)"', line)
+                    if match:
+                        device_name = match.group(1)
+
+                elif line.startswith('"ProductID"'):
+                    match = re.search(r'"ProductID" = (\d+)', line)
+                    if match:
+                        device_id = int(match.group(1))
+
+                builtin_device = Device(name=device_name, device_id=device_id, device_type=device_type)
+
+                return builtin_device
         return None
 
     # Audio
