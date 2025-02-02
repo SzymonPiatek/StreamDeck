@@ -71,13 +71,13 @@ class Application:
 
         self.device_config.save_file(data=data)
 
-    def execute_macro(self, function):
-        if function == "Volume -":
-            self.system.volume_down()
-        elif function == "Volume +":
-            self.system.volume_up()
-        elif function == "Mute/Unmute":
-            self.system.mute_unmute()
+    def execute_macro(self, function_name):
+        for func in self.system.functions:
+            if func["name"] == function_name:
+                func["function"]()
+                return
+
+        print(f"DEBUG: Nie znaleziono funkcji '{function_name}'")
 
     def on_key_press(self, event):
         key_name = event.name

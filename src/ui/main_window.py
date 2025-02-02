@@ -22,9 +22,7 @@ class Window(QWidget):
 
         self.application = application
 
-        self.setWindowTitle(
-            f"{self.application.settings['APP_NAME']} {self.application.system.name}"
-        )
+        self.setWindowTitle(f"{self.application.settings['APP_NAME']} {self.application.system.name}")
         self.setGeometry(*self.application.settings["APP_GEOMETRY"])
         self.setStyleSheet(open("src/ui/themes/py_dracula_dark.qss", "r").read())
 
@@ -48,9 +46,7 @@ class Window(QWidget):
 
         self.refresh_device_select_button = QPushButton("Odśwież")
         self.refresh_device_select_button.clicked.connect(self.refresh_device_list)
-        self.refresh_device_select_button.setSizePolicy(
-            QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred
-        )
+        self.refresh_device_select_button.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         self.refresh_device_select_button.setMinimumHeight(30)
 
         self.navbar.addWidget(self.device_select)
@@ -107,15 +103,13 @@ class Window(QWidget):
             key_label = QLabel(macro["key"])
 
             function_select = QComboBox()
-            for function in self.application.settings["MACRO_FUNCTIONS"]:
-                function_select.addItem(function)
+            for function in self.application.system.functions:
+                function_select.addItem(function["name"])
 
             function_select.setCurrentText(macro.get("function", "Wybierz funkcję"))
 
             function_select.currentIndexChanged.connect(
-                lambda _, k=macro["key"], f=function_select: self.on_macro_change(
-                    k, f.currentText()
-                )
+                lambda _, k=macro["key"], f=function_select: self.on_macro_change(k, f.currentText())
             )
 
             layout.addWidget(key_label)
@@ -128,6 +122,4 @@ class Window(QWidget):
 
     def on_macro_change(self, key, function):
         self.application.save_macro(key, function)
-        self.application.macros = self.application.load_macros_for_device(
-            self.application.current_device
-        )
+        self.application.macros = self.application.load_macros_for_device(self.application.current_device)
