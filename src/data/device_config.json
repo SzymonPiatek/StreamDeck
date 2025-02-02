@@ -5,12 +5,8 @@
     "device_type": "Builtin",
     "macros": [
       {
-        "key": "command",
-        "function": "Volume +"
-      },
-      {
-        "key": "alt",
-        "function": "Volume -"
+        "key": "shift",
+        "function": "Toggle Spotify"
       }
     ]
   },

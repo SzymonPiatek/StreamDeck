@@ -1,4 +1,5 @@
 import os
+from functools import partial
 
 from PyQt6.QtCore import QRect
 from PyQt6.QtWidgets import (
@@ -115,13 +116,14 @@ class Window(QWidget):
             layout.setContentsMargins(5, 5, 5, 5)
 
             key_button = QPushButton(macro["key"])
-            key_button.clicked.connect(lambda _, k=macro: self.application.system.listen_for_key(k, key_button))
+            key_button.clicked.connect(partial(self.application.system.listen_for_key, macro, key_button))
 
             function_select = QComboBox()
             for function in self.application.system.functions:
                 function_select.addItem(function["name"])
 
             function_select.setCurrentText(macro.get("function", "Wybierz funkcję"))
+
             function_select.currentIndexChanged.connect(
                 lambda _, k=macro["key"], f=function_select: self.on_macro_change(k, f.currentText())
             )
@@ -134,6 +136,6 @@ class Window(QWidget):
             self.macro_list.addItem(item)
             self.macro_list.setItemWidget(item, item_widget)
 
-    def on_macro_change(self, key, function):
-        self.application.save_macro(key, function)
+    def on_macro_change(self, key, function_name):
+        self.application.save_macro(key, function_name)
         self.application.macros = self.application.load_macros_for_device(self.application.current_device)
