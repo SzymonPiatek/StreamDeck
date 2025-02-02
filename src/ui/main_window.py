@@ -159,6 +159,7 @@ class Window(QWidget):
 
             key_button = QPushButton(macro["key"] if macro["key"] else "Ustaw klawisz")
             key_button.clicked.connect(partial(self.application.system.listen_for_key, macro, key_button))
+            key_button.setFixedHeight(30)
 
             function_select = QComboBox()
             function_select.addItem("Wybierz funkcję")
@@ -170,11 +171,13 @@ class Window(QWidget):
             function_select.currentIndexChanged.connect(
                 lambda _, k=macro["key"], f=function_select: self.on_macro_change(k, f.currentText())
             )
+            function_select.setFixedHeight(30)
 
             delete_button = QPushButton()
             delete_button.setIcon(QIcon("src/ui/icons/trash-solid.svg"))
             delete_button.setFixedSize(30, 30)
             delete_button.clicked.connect(partial(self.delete_macro, macro))
+            delete_button.setFixedHeight(30)
 
             layout.addWidget(key_button)
             layout.addWidget(function_select)
