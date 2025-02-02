@@ -4,7 +4,7 @@ import threading
 
 from PyQt6.QtWidgets import QApplication
 
-from src.application.file.file import JSONFile
+from src.file.file import JSONFile
 from src.system.macOS.macOS import MacOS
 from src.system.windows.windows import Windows
 from src.ui.main_window import Window
@@ -22,7 +22,7 @@ class Application:
         self.listener_thread = None
 
         # Files
-        self.device_config = JSONFile(path="src/data/config.json")
+        self.device_config = JSONFile(path="src/data/device_config.json")
 
     def run(self):
         if not self.system:
@@ -51,7 +51,7 @@ class Application:
         for entry in data:
             if entry["device"] == device:
                 return entry.get("macros", [])
-            return []
+        return []
 
     def save_macro(self, key, function):
         if not self.current_device:
@@ -71,17 +71,40 @@ class Application:
 
         self.device_config.save_file(data=data)
 
-    def execute_macro(self, function):
-        if function == "Volume -":
-            self.system.volume_down()
-        elif function == "Volume +":
-            self.system.volume_up()
-        elif function == "Mute/Unmute":
-            self.system.mute_unmute()
+    def execute_macro(self, function_name):
+        for func in self.system.functions:
+            if func["name"] == function_name:
+                func["function"]()
+                return
+
+        print(f"DEBUG: Nie znaleziono funkcji '{function_name}'")
+
+    def update_macro_key(self, old_key, new_key):
+        if not self.current_device:
+            return
+
+        data = self.load_device_config()
+
+        for entry in data:
+            if entry["device"] == self.current_device:
+                for macro in entry["macros"]:
+                    if macro["key"] == old_key:
+                        macro["key"] = new_key
+                        self.device_config.save_file(data=data)
+
+                        self.macros = self.load_macros_for_device(self.current_device)
+                        self.start_keyboard_listener()
+                        return
 
     def on_key_press(self, event):
         key_name = event.name
-        print(f"DEBUG: Wykryto naciśnięcie klawisza: {key_name}")
+        active_device = self.system.get_active_input_device()
+
+        if not active_device:
+            return
+
+        if active_device != self.current_device:
+            return
 
         for macro in self.macros:
             if macro["key"] == key_name:

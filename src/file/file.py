@@ -21,6 +21,7 @@ class JSONFile(File):
     def save_file(self, data):
         with open(self.path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=self.indent, ensure_ascii=False)
+            f.write("\n")
 
     def load_file(self):
         try:
