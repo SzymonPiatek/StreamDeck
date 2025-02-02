@@ -178,7 +178,6 @@ class Window(QWidget):
             key_button.clicked.connect(partial(self.application.system.listen_for_key, macro, key_button))
 
             function_select = QComboBox()
-            function_select.addItem("Wybierz funkcję")
             for function in self.application.system.functions:
                 function_select.addItem(function["name"])
 

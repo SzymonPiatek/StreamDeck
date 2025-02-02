@@ -6,15 +6,11 @@
     "macros": [
       {
         "key": "shift",
-        "function": ""
+        "function": "Toggle Spotify"
       },
       {
         "key": "ctrl",
-        "function": "Mute/Unmute"
-      },
-      {
-        "key": "",
-        "function": ""
+        "function": "Toggle Spotify"
       }
     ]
   }
