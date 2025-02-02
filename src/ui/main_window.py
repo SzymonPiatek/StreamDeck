@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QGridLayout,
+    QScrollArea,
 )
 
 os.environ["QT_FONT_DPI"] = "96"
@@ -62,14 +63,20 @@ class Window(QWidget):
         self.main_layout.addWidget(self.navbar_widget)
 
         # Content
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)
+
         self.content_widget = QWidget(self)
         self.content_widget.setObjectName("content_widget")
 
         self.content_layout = QVBoxLayout()
         self.content_layout.setContentsMargins(0, 0, 0, 0)
+
         self.content_widget.setLayout(self.content_layout)
 
-        self.main_layout.addWidget(self.content_widget, 1)
+        self.scroll_area.setWidget(self.content_widget)
+
+        self.main_layout.addWidget(self.scroll_area)
 
         # Macro list
         self.macro_grid = QGridLayout()
