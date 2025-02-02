@@ -6,7 +6,19 @@
     "macros": [
       {
         "key": "shift",
-        "function": "Toggle Spotify"
+        "function": "Brightness +"
+      },
+      {
+        "key": "ctrl",
+        "function": "Volume +"
+      },
+      {
+        "key": "command",
+        "function": "Volume -"
+      },
+      {
+        "key": "",
+        "function": ""
       }
     ]
   },

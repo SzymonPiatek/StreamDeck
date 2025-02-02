@@ -76,7 +76,15 @@ class Window(QWidget):
         self.application.start_keyboard_listener()
 
     def add_macro_section(self):
-        pass
+        if not self.application.current_device:
+            return
+
+        new_macro = {"key": "", "function": ""}
+        self.application.macros.append(new_macro)
+
+        self.application.save_macro("", "")
+
+        self.populate_macro_list()
 
     def refresh_device_list(self):
         self.application.recognized_devices = self.application.system.recognize_devices()
@@ -115,10 +123,11 @@ class Window(QWidget):
             layout = QHBoxLayout()
             layout.setContentsMargins(5, 5, 5, 5)
 
-            key_button = QPushButton(macro["key"])
+            key_button = QPushButton(macro["key"] if macro["key"] else "Ustaw klawisz")
             key_button.clicked.connect(partial(self.application.system.listen_for_key, macro, key_button))
 
             function_select = QComboBox()
+            function_select.addItem("Wybierz funkcję")
             for function in self.application.system.functions:
                 function_select.addItem(function["name"])
 
