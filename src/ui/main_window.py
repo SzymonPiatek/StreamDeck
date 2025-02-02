@@ -46,11 +46,13 @@ class Window(QWidget):
         self.device_select.currentIndexChanged.connect(self.on_select_device)
 
         self.add_new_macro_button = QPushButton("Dodaj makro")
+        self.add_new_macro_button.setIcon(QIcon("src/ui/icons/plus-solid.svg"))
         self.add_new_macro_button.clicked.connect(self.add_macro_section)
         self.add_new_macro_button.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         self.add_new_macro_button.setMinimumHeight(30)
 
         self.refresh_device_select_button = QPushButton("Odśwież")
+        self.refresh_device_select_button.setIcon(QIcon("src/ui/icons/rotate-solid.svg"))
         self.refresh_device_select_button.clicked.connect(self.refresh_device_list)
         self.refresh_device_select_button.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         self.refresh_device_select_button.setMinimumHeight(30)
