@@ -81,7 +81,13 @@ class Application:
 
     def on_key_press(self, event):
         key_name = event.name
-        print(f"DEBUG: Wykryto naciśnięcie klawisza: {key_name}")
+        active_device = self.system.get_active_input_device()
+
+        if not active_device:
+            return
+
+        if active_device != self.current_device:
+            return
 
         for macro in self.macros:
             if macro["key"] == key_name:

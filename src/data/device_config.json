@@ -4,17 +4,16 @@
     "device_id": 0,
     "device_type": "Builtin",
     "macros": [
+      {
+        "key": "ctrl",
+        "function": "Toggle Spotify"
+      }
     ]
   },
   {
     "device": "LIFT MAC",
     "device_id": "0xB031",
     "device_type": "Bluetooth",
-    "macros": [
-      {
-        "key": "ctrl",
-        "function": "Toggle Spotify"
-      }
-    ]
+    "macros": []
   }
 ]

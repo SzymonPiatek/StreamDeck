@@ -42,6 +42,30 @@ class MacOS(System):
             {"name": "Previous track spotify", "function": self.previous_spotify},
         ]
 
+    def get_active_input_device(self):
+        result = subprocess.getoutput("ioreg -r -c IOHIDDevice")
+
+        devices = []
+        current_device = None
+
+        for line in result.split("\n"):
+            line = line.strip()
+
+            if '"Product"' in line:
+                match = re.search(r'"Product" = "(.*?)"', line)
+                if match:
+                    current_device = match.group(1)
+
+            if current_device and (
+                "Keyboard" in current_device or "Trackpad" in current_device or "Mouse" in current_device
+            ):
+                devices.append(current_device)
+
+        if devices:
+            return devices[0]
+
+        return None
+
     def recognize_devices(self):
         devices = [self.get_builtin_keyboard()]
 
