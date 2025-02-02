@@ -5,11 +5,11 @@
     "device_type": "Builtin",
     "macros": [
       {
-        "key": "shift",
-        "function": "Brightness +"
+        "key": "ctrl",
+        "function": "Open app"
       },
       {
-        "key": "ctrl",
+        "key": "right shift",
         "function": "Volume +"
       },
       {
@@ -17,14 +17,18 @@
         "function": "Volume -"
       },
       {
-        "key": "",
-        "function": ""
+        "key": "alt",
+        "function": "Toggle bar"
+      },
+      {
+        "key": "shift",
+        "function": "Brightness -"
       }
     ]
   },
   {
-    "device": "LIFT MAC",
-    "device_id": "0xB031",
+    "device": "Szymon Buds 2",
+    "device_id": null,
     "device_type": "Bluetooth",
     "macros": []
   }

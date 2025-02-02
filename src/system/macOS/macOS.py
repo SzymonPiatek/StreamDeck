@@ -31,7 +31,7 @@ class MacOS(System):
             {"name": "Mute/Unmute", "function": self.mute_unmute},
             {"name": "Brightness +", "function": self.increase_brightness},
             {"name": "Brightness -", "function": self.decrease_brightness},
-            {"name": "Toogle disturb", "function": self.toggle_do_not_disturb},
+            {"name": "Toggle bar", "function": self.toggle_bar},
             {"name": "Open app", "function": self.open_app},
             {"name": "Open url", "function": self.open_url},
             {"name": "Toggle music", "function": self.toggle_music},
@@ -253,7 +253,7 @@ class MacOS(System):
 
     # Do not disturb
     @handle_subprocess_error
-    def toggle_do_not_disturb(self):
+    def toggle_bar(self):
         script = """
         tell application "System Events"
             tell process "ControlCenter"
