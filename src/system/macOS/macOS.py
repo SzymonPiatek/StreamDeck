@@ -185,18 +185,42 @@ class MacOS(System):
         except Exception as e:
             print(f"DEBUG: Błąd podczas nasłuchiwania klawiszy: {e}")
 
+    def listen_for_key(self, macro, key_button):
+        key_button.setText("Naciśnij klawisz...")
+        key_button.setEnabled(False)
+
+        def on_key_press(event):
+            new_key = event.name
+            keyboard.unhook_all()
+
+            for existing_macro in self.application.macros:
+                if existing_macro["key"] == new_key:
+                    key_button.setText(macro["key"])
+                    key_button.setEnabled(True)
+                    return
+
+            old_key = macro["key"]
+            macro["key"] = new_key
+            key_button.setText(new_key)
+            key_button.setEnabled(True)
+
+            self.application.update_macro_key(old_key, new_key)
+
+        keyboard.hook(on_key_press)
+        return
+
     # Audio
     @handle_subprocess_error
     def volume_up(self):
         subprocess.run(
-            ["osascript", "-e", "set volume output volume (output volume of (get volume settings) + 10) --100 max"],
+            ["osascript", "-e", "set volume output volume (output volume of (get volume settings) + 5) --100 max"],
             check=True,
         )
 
     @handle_subprocess_error
     def volume_down(self):
         subprocess.run(
-            ["osascript", "-e", "set volume output volume (output volume of (get volume settings) - 10) --100 max"],
+            ["osascript", "-e", "set volume output volume (output volume of (get volume settings) - 5) --100 max"],
             check=True,
         )
 

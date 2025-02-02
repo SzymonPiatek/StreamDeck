@@ -9,7 +9,6 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QListWidget,
     QListWidgetItem,
-    QLabel,
     QSizePolicy,
 )
 
@@ -44,6 +43,11 @@ class Window(QWidget):
         self.device_select.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.device_select.currentIndexChanged.connect(self.on_select_device)
 
+        self.add_new_macro_button = QPushButton("Dodaj makro")
+        self.add_new_macro_button.clicked.connect(self.add_macro_section)
+        self.add_new_macro_button.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+        self.add_new_macro_button.setMinimumHeight(30)
+
         self.refresh_device_select_button = QPushButton("Odśwież")
         self.refresh_device_select_button.clicked.connect(self.refresh_device_list)
         self.refresh_device_select_button.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
@@ -51,6 +55,7 @@ class Window(QWidget):
 
         self.navbar.addWidget(self.device_select)
         self.navbar.addWidget(self.refresh_device_select_button)
+        self.navbar.addWidget(self.add_new_macro_button)
         self.main_layout.addWidget(self.navbar_widget)
 
         self.main_layout.addSpacing(5)
@@ -68,6 +73,9 @@ class Window(QWidget):
 
         self.refresh_device_list()
         self.application.start_keyboard_listener()
+
+    def add_macro_section(self):
+        pass
 
     def refresh_device_list(self):
         self.application.recognized_devices = self.application.system.recognize_devices()
@@ -106,19 +114,19 @@ class Window(QWidget):
             layout = QHBoxLayout()
             layout.setContentsMargins(5, 5, 5, 5)
 
-            key_label = QLabel(macro["key"])
+            key_button = QPushButton(macro["key"])
+            key_button.clicked.connect(lambda _, k=macro: self.application.system.listen_for_key(k, key_button))
 
             function_select = QComboBox()
             for function in self.application.system.functions:
                 function_select.addItem(function["name"])
 
             function_select.setCurrentText(macro.get("function", "Wybierz funkcję"))
-
             function_select.currentIndexChanged.connect(
                 lambda _, k=macro["key"], f=function_select: self.on_macro_change(k, f.currentText())
             )
 
-            layout.addWidget(key_label)
+            layout.addWidget(key_button)
             layout.addWidget(function_select)
             item_widget.setLayout(layout)
 

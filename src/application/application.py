@@ -79,6 +79,23 @@ class Application:
 
         print(f"DEBUG: Nie znaleziono funkcji '{function_name}'")
 
+    def update_macro_key(self, old_key, new_key):
+        if not self.current_device:
+            return
+
+        data = self.load_device_config()
+
+        for entry in data:
+            if entry["device"] == self.current_device:
+                for macro in entry["macros"]:
+                    if macro["key"] == old_key:
+                        macro["key"] = new_key
+                        self.device_config.save_file(data=data)
+
+                        self.macros = self.load_macros_for_device(self.current_device)
+                        self.start_keyboard_listener()
+                        return
+
     def on_key_press(self, event):
         key_name = event.name
         active_device = self.system.get_active_input_device()
