@@ -34,7 +34,7 @@ QComboBox::drop-down {
     background: #111115;
 }
 
-#macro_list {
+#content_widget {
     background-color: #181818;
     padding: 8px;
 }

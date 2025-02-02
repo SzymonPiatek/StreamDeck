@@ -7,12 +7,11 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QComboBox,
-    QListWidget,
-    QListWidgetItem,
     QSizePolicy,
     QPushButton,
     QHBoxLayout,
     QLabel,
+    QGridLayout,
 )
 
 os.environ["QT_FONT_DPI"] = "96"
@@ -59,18 +58,25 @@ class Window(QWidget):
         self.navbar.addWidget(self.device_select, stretch=1)
         self.navbar.addWidget(refresh_device_select_button, stretch=0)
         self.navbar.addWidget(add_new_macro_button, stretch=0)
+
         self.main_layout.addWidget(self.navbar_widget)
 
-        # Macro list
+        # Content
         self.content_widget = QWidget(self)
+        self.content_widget.setObjectName("content_widget")
+
         self.content_layout = QVBoxLayout()
         self.content_layout.setContentsMargins(0, 0, 0, 0)
         self.content_widget.setLayout(self.content_layout)
 
-        self.macro_list = QListWidget()
-        self.macro_list.setObjectName("macro_list")
-        self.content_layout.addWidget(self.macro_list)
         self.main_layout.addWidget(self.content_widget, 1)
+
+        # Macro list
+        self.macro_grid = QGridLayout()
+        self.macro_grid.setContentsMargins(0, 0, 0, 0)
+        self.macro_grid.setSpacing(8)
+
+        self.content_layout.addLayout(self.macro_grid)
 
         self.refresh_device_list()
         self.application.start_keyboard_listener()
@@ -148,18 +154,21 @@ class Window(QWidget):
         self.populate_macro_list()
 
     def populate_macro_list(self):
-        self.macro_list.clear()
+        while self.macro_grid.count():
+            item = self.macro_grid.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        num_columns = 2
+        row, col = 0, 0
 
         for macro in self.application.macros:
-            item = QListWidgetItem(self.macro_list)
             item_widget = QWidget()
-
             layout = QHBoxLayout()
-            layout.setContentsMargins(0, 0, 0, 0)
 
             key_button = QPushButton(macro["key"] if macro["key"] else "Ustaw klawisz")
-            key_button.clicked.connect(partial(self.application.system.listen_for_key, macro, key_button))
             key_button.setFixedHeight(30)
+            key_button.clicked.connect(partial(self.application.system.listen_for_key, macro, key_button))
 
             function_select = QComboBox()
             function_select.addItem("Wybierz funkcję")
@@ -167,28 +176,29 @@ class Window(QWidget):
                 function_select.addItem(function["name"])
 
             function_select.setCurrentText(macro.get("function", "Wybierz funkcję"))
-
+            function_select.setFixedHeight(30)
             function_select.currentIndexChanged.connect(
                 lambda _, k=macro["key"], f=function_select: self.on_macro_change(k, f.currentText())
             )
-            function_select.setFixedHeight(30)
 
             delete_button = QPushButton()
             delete_button.setIcon(QIcon("src/ui/icons/trash-solid.svg"))
             delete_button.setFixedSize(30, 30)
             delete_button.clicked.connect(partial(self.delete_macro, macro))
-            delete_button.setFixedHeight(30)
 
             layout.addWidget(key_button)
             layout.addWidget(function_select)
             layout.addWidget(delete_button)
-
             item_widget.setLayout(layout)
-            item_widget.setObjectName("macro_item")
 
-            item.setSizeHint(item_widget.sizeHint())
-            self.macro_list.addItem(item)
-            self.macro_list.setItemWidget(item, item_widget)
+            self.macro_grid.addWidget(item_widget, row, col)
+
+            col += 1
+            if col >= num_columns:
+                col = 0
+                row += 1
+
+        self.content_layout.addStretch(1)
 
     def on_macro_change(self, key, function_name):
         self.application.save_macro(key, function_name)
