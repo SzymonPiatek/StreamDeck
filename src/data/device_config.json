@@ -5,7 +5,7 @@
     "device_type": "Builtin",
     "macros": [
       {
-        "key": "",
+        "key": "shift",
         "function": ""
       }
     ]

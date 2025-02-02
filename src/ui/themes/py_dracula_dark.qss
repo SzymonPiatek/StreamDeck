@@ -1,35 +1,40 @@
 QPushButton {
-    background-color: #444;
+    background-color: #992222;
     color: white;
     font-size: 12px;
     padding: 8px 16px;
     border-radius: 5px;
-    border: 1px solid #555;
 }
 
 QPushButton:hover {
-    background-color: #555;
+    background-color: #812222;
 }
 
 QPushButton:pressed {
-    background-color: #666;
+    background-color: #772222;
 }
 
 QComboBox {
-    background-color: #333;
+    background-color: #222;
     color: white;
     font-size: 12px;
-    padding: 6px;
+    padding: 4px;
+    padding-left: 8px;
     border: 1px solid #555;
     border-radius: 5px;
 }
+
 QComboBox::drop-down {
     width: 20px;
     border-left: 1px solid #555;
     background-color: #444;
 }
-QComboBox QAbstractItemView {
-    background-color: #222;
-    color: white;
-    selection-background-color: #555;
+
+#navbar {
+    background: #111115;
+}
+
+#macro_list {
+    background-color: #181818;
+    padding: 8px;
 }

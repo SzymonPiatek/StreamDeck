@@ -23,10 +23,11 @@ class Window(QWidget):
         super().__init__()
 
         self.application = application
+        self.style_file = "src/ui/themes/py_dracula_dark.qss"
 
         self.setWindowTitle(f"{self.application.settings['APP_NAME']} {self.application.system.name}")
         self.setGeometry(*self.application.settings["APP_GEOMETRY"])
-        self.setStyleSheet(open("src/ui/themes/py_dracula_dark.qss", "r").read())
+        self.reload_stylesheet()
 
         self.main_layout = QVBoxLayout()
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -40,6 +41,7 @@ class Window(QWidget):
         self.navbar.setGeometry(QRect(0, 0, 800, 120))
 
         self.navbar_widget = QWidget()
+        self.navbar_widget.setObjectName("navbar")
         self.navbar_widget.setLayout(self.navbar)
 
         self.device_select = QComboBox()
@@ -59,26 +61,26 @@ class Window(QWidget):
         self.navbar.addWidget(add_new_macro_button, stretch=0)
         self.main_layout.addWidget(self.navbar_widget)
 
-        self.main_layout.addSpacing(5)
-
         # Macro list
         self.content_widget = QWidget(self)
-        self.content_widget.setStyleSheet("background-color: #222;")
         self.content_layout = QVBoxLayout()
-        self.content_layout.setContentsMargins(10, 10, 10, 10)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
         self.content_widget.setLayout(self.content_layout)
 
         self.macro_list = QListWidget()
+        self.macro_list.setObjectName("macro_list")
         self.content_layout.addWidget(self.macro_list)
         self.main_layout.addWidget(self.content_widget, 1)
 
         self.refresh_device_list()
         self.application.start_keyboard_listener()
 
+    def reload_stylesheet(self):
+        self.setStyleSheet(open(self.style_file, "r").read())
+
     def button_with_icon(self, text, icon, on_click):
         button = QPushButton()
         button.setMinimumHeight(30)
-        button.setStyleSheet("border: none;")
 
         button_layout = QHBoxLayout()
         button_layout.setContentsMargins(10, 5, 10, 5)
@@ -117,6 +119,8 @@ class Window(QWidget):
         self.populate_macro_list()
 
     def refresh_device_list(self):
+        self.reload_stylesheet()
+
         self.application.recognized_devices = self.application.system.recognize_devices()
         self.device_select.clear()
         self.device_select.addItems([device.name for device in self.application.recognized_devices])
@@ -151,7 +155,7 @@ class Window(QWidget):
             item_widget = QWidget()
 
             layout = QHBoxLayout()
-            layout.setContentsMargins(5, 5, 5, 5)
+            layout.setContentsMargins(0, 0, 0, 0)
 
             key_button = QPushButton(macro["key"] if macro["key"] else "Ustaw klawisz")
             key_button.clicked.connect(partial(self.application.system.listen_for_key, macro, key_button))
@@ -177,6 +181,7 @@ class Window(QWidget):
             layout.addWidget(delete_button)
 
             item_widget.setLayout(layout)
+            item_widget.setObjectName("macro_item")
 
             item.setSizeHint(item_widget.sizeHint())
             self.macro_list.addItem(item)
