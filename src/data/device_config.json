@@ -5,23 +5,9 @@
     "device_type": "Builtin",
     "macros": [
       {
-        "key": "shift",
-        "function": "Toggle microphone"
-      },
-      {
-        "key": "command",
+        "key": "alt",
         "function": "Volume +"
-      },
-      {
-        "key": "ctrl",
-        "function": "Open calculator"
       }
     ]
-  },
-  {
-    "device": "Szymon Buds 2",
-    "device_id": null,
-    "device_type": "Bluetooth",
-    "macros": []
   }
 ]

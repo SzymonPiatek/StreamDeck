@@ -2,6 +2,7 @@ import os
 from functools import partial
 
 from PyQt6.QtCore import QRect
+from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import (
     QVBoxLayout,
     QHBoxLayout,
@@ -137,8 +138,15 @@ class Window(QWidget):
                 lambda _, k=macro["key"], f=function_select: self.on_macro_change(k, f.currentText())
             )
 
+            delete_button = QPushButton()
+            delete_button.setIcon(QIcon("src/ui/icons/trash-solid.svg"))
+            delete_button.setFixedSize(30, 30)
+            delete_button.clicked.connect(partial(self.delete_macro, macro))
+
             layout.addWidget(key_button)
             layout.addWidget(function_select)
+            layout.addWidget(delete_button)
+
             item_widget.setLayout(layout)
 
             item.setSizeHint(item_widget.sizeHint())
@@ -148,3 +156,22 @@ class Window(QWidget):
     def on_macro_change(self, key, function_name):
         self.application.save_macro(key, function_name)
         self.application.macros = self.application.load_macros_for_device(self.application.current_device)
+
+    def delete_macro(self, macro):
+        if not self.application.current_device:
+            return
+
+        data = self.application.load_device_config()
+
+        for entry in data:
+            if entry["device"] == self.application.current_device:
+                if macro in entry["macros"]:
+                    entry["macros"].remove(macro)
+                    break
+
+        self.application.device_config.save_file(data)
+
+        if macro in self.application.macros:
+            self.application.macros.remove(macro)
+
+        self.populate_macro_list()
