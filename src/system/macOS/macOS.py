@@ -10,7 +10,6 @@ def handle_subprocess_error(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
-            print(func.__name__)
             return func(*args, **kwargs)
         except subprocess.CalledProcessError as e:
             print(f"DEBUG: Błąd w funkcji {func.__name__}: {e}")
