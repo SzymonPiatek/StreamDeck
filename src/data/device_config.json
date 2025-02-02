@@ -6,11 +6,15 @@
     "macros": [
       {
         "key": "shift",
-        "function": "Toggle Spotify"
+        "function": "Open finder"
       },
       {
         "key": "ctrl",
-        "function": "Toggle Spotify"
+        "function": "Lock screen"
+      },
+      {
+        "key": "",
+        "function": "Lock screen"
       }
     ]
   }

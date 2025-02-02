@@ -44,13 +44,10 @@ class MacOS(System):
             {"name": "Brightness -", "function": self.decrease_brightness},
             # Utils
             {"name": "Toggle bar", "function": self.toggle_bar},
-            {"name": "Open app", "function": self.open_app},
-            {"name": "Open url", "function": self.open_url},
             {"name": "Open calculator", "function": self.open_calculator},
             {"name": "Open terminal", "function": self.open_terminal},
             {"name": "Open google chrome", "function": self.open_google_chrome},
             {"name": "Open finder", "function": self.open_finder},
-            {"name": "Lock screen", "function": self.lock_screen},
         ]
 
     def get_active_input_device(self):
@@ -328,7 +325,3 @@ class MacOS(System):
 
     def open_finder(self):
         self.open_app("Finder")
-
-    @handle_subprocess_error
-    def lock_screen(self):
-        subprocess.run(["pmset", "displaysleepnow"], check=True)
