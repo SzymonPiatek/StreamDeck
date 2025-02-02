@@ -45,21 +45,17 @@ class Window(QWidget):
         self.device_select.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         self.device_select.currentIndexChanged.connect(self.on_select_device)
 
-        self.add_new_macro_button = QPushButton("Dodaj makro")
-        self.add_new_macro_button.setIcon(QIcon("src/ui/icons/plus-solid.svg"))
-        self.add_new_macro_button.clicked.connect(self.add_macro_section)
-        self.add_new_macro_button.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
-        self.add_new_macro_button.setMinimumHeight(30)
+        add_new_macro_button = self.button_with_icon(
+            text="Dodaj makro", icon="src/ui/icons/plus-solid.svg", on_click=self.add_macro_section
+        )
 
-        self.refresh_device_select_button = QPushButton("Odśwież")
-        self.refresh_device_select_button.setIcon(QIcon("src/ui/icons/rotate-solid.svg"))
-        self.refresh_device_select_button.clicked.connect(self.refresh_device_list)
-        self.refresh_device_select_button.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
-        self.refresh_device_select_button.setMinimumHeight(30)
+        refresh_device_select_button = self.button_with_icon(
+            text="Odśwież", icon="src/ui/icons/rotate-solid.svg", on_click=self.refresh_device_list
+        )
 
         self.navbar.addWidget(self.device_select)
-        self.navbar.addWidget(self.refresh_device_select_button)
-        self.navbar.addWidget(self.add_new_macro_button)
+        self.navbar.addWidget(refresh_device_select_button)
+        self.navbar.addWidget(add_new_macro_button)
         self.main_layout.addWidget(self.navbar_widget)
 
         self.main_layout.addSpacing(5)
@@ -77,6 +73,15 @@ class Window(QWidget):
 
         self.refresh_device_list()
         self.application.start_keyboard_listener()
+
+    def button_with_icon(self, text, icon, on_click):
+        component = QPushButton(text)
+        component.setIcon(QIcon(icon))
+        component.clicked.connect(on_click)
+        component.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+        component.setMinimumHeight(30)
+
+        return component
 
     def add_macro_section(self):
         if not self.application.current_device:

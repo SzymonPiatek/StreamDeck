@@ -5,8 +5,8 @@
     "device_type": "Builtin",
     "macros": [
       {
-        "key": "alt",
-        "function": "Volume +"
+        "key": "",
+        "function": ""
       }
     ]
   }
