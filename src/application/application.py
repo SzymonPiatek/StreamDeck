@@ -22,7 +22,7 @@ class Application:
         self.listener_thread = None
 
         # Files
-        self.device_config = JSONFile(path="src/data/config.json")
+        self.device_config = JSONFile(path="src/data/device_config.json")
 
     def run(self):
         if not self.system:
