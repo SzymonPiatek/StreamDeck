@@ -74,7 +74,7 @@ class Window(QWidget):
         # Macro list
         self.macro_grid = QGridLayout()
         self.macro_grid.setContentsMargins(0, 0, 0, 0)
-        self.macro_grid.setSpacing(8)
+        self.macro_grid.setSpacing(0)
 
         self.content_layout.addLayout(self.macro_grid)
 

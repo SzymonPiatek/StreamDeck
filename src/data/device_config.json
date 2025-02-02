@@ -5,6 +5,14 @@
     "device_type": "Builtin",
     "macros": [
       {
+        "key": "shift",
+        "function": ""
+      },
+      {
+        "key": "ctrl",
+        "function": "Mute/Unmute"
+      },
+      {
         "key": "",
         "function": ""
       }
