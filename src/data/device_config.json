@@ -9,5 +9,11 @@
         "function": ""
       }
     ]
+  },
+  {
+    "device": "Szymon Buds 2",
+    "device_id": null,
+    "device_type": "Bluetooth",
+    "macros": []
   }
 ]

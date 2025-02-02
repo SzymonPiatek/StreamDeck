@@ -1,17 +1,18 @@
 import os
 from functools import partial
 
-from PyQt6.QtCore import QRect
-from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import QRect, QSize
+from PyQt6.QtGui import QFontMetrics, QIcon
 from PyQt6.QtWidgets import (
     QVBoxLayout,
-    QHBoxLayout,
     QWidget,
     QComboBox,
-    QPushButton,
     QListWidget,
     QListWidgetItem,
     QSizePolicy,
+    QPushButton,
+    QHBoxLayout,
+    QLabel,
 )
 
 os.environ["QT_FONT_DPI"] = "96"
@@ -53,9 +54,9 @@ class Window(QWidget):
             text="Odśwież", icon="src/ui/icons/rotate-solid.svg", on_click=self.refresh_device_list
         )
 
-        self.navbar.addWidget(self.device_select)
-        self.navbar.addWidget(refresh_device_select_button)
-        self.navbar.addWidget(add_new_macro_button)
+        self.navbar.addWidget(self.device_select, stretch=1)
+        self.navbar.addWidget(refresh_device_select_button, stretch=0)
+        self.navbar.addWidget(add_new_macro_button, stretch=0)
         self.main_layout.addWidget(self.navbar_widget)
 
         self.main_layout.addSpacing(5)
@@ -75,13 +76,34 @@ class Window(QWidget):
         self.application.start_keyboard_listener()
 
     def button_with_icon(self, text, icon, on_click):
-        component = QPushButton(text)
-        component.setIcon(QIcon(icon))
-        component.clicked.connect(on_click)
-        component.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
-        component.setMinimumHeight(30)
+        button = QPushButton()
+        button.setMinimumHeight(30)
+        button.setStyleSheet("border: none;")
 
-        return component
+        button_layout = QHBoxLayout()
+        button_layout.setContentsMargins(10, 5, 10, 5)
+        button_layout.setSpacing(8)
+
+        icon_label = QLabel()
+        icon = QIcon(icon)
+        icon_label.setPixmap(icon.pixmap(QSize(18, 18)))
+
+        text_label = QLabel(text)
+
+        button_layout.addWidget(icon_label)
+        button_layout.addWidget(text_label)
+        button_layout.addStretch()
+
+        button.setLayout(button_layout)
+        button.clicked.connect(on_click)
+
+        font_metrics = QFontMetrics(button.font())
+        text_width = font_metrics.horizontalAdvance(text)
+        total_width = text_width + 50
+
+        button.setMinimumWidth(total_width)
+
+        return button
 
     def add_macro_section(self):
         if not self.application.current_device:
