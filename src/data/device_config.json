@@ -5,24 +5,16 @@
     "device_type": "Builtin",
     "macros": [
       {
-        "key": "ctrl",
-        "function": "Open app"
-      },
-      {
-        "key": "right shift",
-        "function": "Volume +"
+        "key": "shift",
+        "function": "Toggle microphone"
       },
       {
         "key": "command",
-        "function": "Volume -"
+        "function": "Volume +"
       },
       {
-        "key": "alt",
-        "function": "Toggle bar"
-      },
-      {
-        "key": "shift",
-        "function": "Brightness -"
+        "key": "ctrl",
+        "function": "Open calculator"
       }
     ]
   },
