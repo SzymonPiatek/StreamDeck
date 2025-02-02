@@ -1,12 +1,19 @@
 [
   {
     "device": "Apple Internal Keyboard / Trackpad",
-    "device_id": null,
+    "device_id": 0,
     "device_type": "Builtin",
+    "macros": [
+    ]
+  },
+  {
+    "device": "LIFT MAC",
+    "device_id": "0xB031",
+    "device_type": "Bluetooth",
     "macros": [
       {
         "key": "ctrl",
-        "function": "Toggle music"
+        "function": "Toggle Spotify"
       }
     ]
   }

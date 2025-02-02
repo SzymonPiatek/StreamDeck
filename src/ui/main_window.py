@@ -79,7 +79,6 @@ class Window(QWidget):
         serializable_data = []
 
         for device in self.application.recognized_devices:
-            print(device)
             device_dict = {
                 "device": device.name,
                 "device_id": device.id,

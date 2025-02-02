@@ -79,25 +79,54 @@ class MacOS(System):
 
     def get_bluetooth_devices(self):
         result = subprocess.getoutput("system_profiler SPBluetoothDataType")
-        devices = []
 
-        current_device = None
-        prev_line = None
+        devices = []
+        inside_connected_section = False
+        current_device_name = None
+        current_device_data = {}
 
         for line in result.split("\n"):
             line = line.strip()
 
-            if "Connected: Yes" in line and prev_line:
-                device_name = prev_line.strip()
-                current_device = Device(name=device_name, device_type="Bluetooth")
+            if line.startswith("Connected:"):
+                inside_connected_section = True
+                continue
 
-            if current_device:
-                devices.append(current_device)
-                current_device = None
+            if line.startswith("Not Connected:"):
+                break
 
-            prev_line = line
+            if inside_connected_section:
+                device_match = re.match(r"^([A-Za-z0-9 ()-_]+):$", line)
+                if device_match:
+                    if current_device_name:
+                        devices.append({"name": current_device_name, "data": current_device_data})
 
-        return devices
+                    current_device_name = device_match.group(1)
+                    current_device_data = {}
+
+                else:
+                    data_match = re.match(r"^(.+?):\s(.+)$", line)
+                    if data_match:
+                        key = data_match.group(1).strip()
+                        value = data_match.group(2).strip()
+
+                        key = key.lower().replace(" ", "_")
+
+                        if key == "minor_type":
+                            key = "minor_type"
+
+                        current_device_data[key] = value
+
+        if current_device_name:
+            devices.append({"name": current_device_name, "data": current_device_data})
+
+        final_devices = []
+        for device in devices:
+            new_device = Device(
+                name=device["name"], device_type="Bluetooth", device_id=device["data"].get("product_id")
+            )
+            final_devices.append(new_device)
+        return final_devices
 
     def get_builtin_keyboard(self):
         result = subprocess.getoutput("ioreg -r -c AppleEmbeddedKeyboard -d 1 | grep -i 'Product'")
@@ -110,20 +139,27 @@ class MacOS(System):
             for line in result.split("\n"):
                 line = line.strip()
 
-                if line.startswith('"Product"'):
+                if '"Product"' in line:
                     match = re.search(r'"Product" = "(.*?)"', line)
                     if match:
                         device_name = match.group(1)
 
-                elif line.startswith('"ProductID"'):
+                if '"ProductID"' in line:
                     match = re.search(r'"ProductID" = (\d+)', line)
                     if match:
                         device_id = int(match.group(1))
 
-                builtin_device = Device(name=device_name, device_id=device_id, device_type=device_type)
+            builtin_device = Device(name=device_name, device_id=device_id, device_type=device_type)
 
-                return builtin_device
+            return builtin_device
         return None
+
+    def device_listener(self):
+        try:
+            keyboard.on_press(self.application.on_key_press)
+            keyboard.wait()
+        except Exception as e:
+            print(f"DEBUG: Błąd podczas nasłuchiwania klawiszy: {e}")
 
     # Audio
     @handle_subprocess_error
@@ -232,10 +268,3 @@ class MacOS(System):
     @handle_subprocess_error
     def previous_spotify(self):
         subprocess.run(["osascript", "-e", 'tell application "Spotify" to previous track'], check=True)
-
-    def device_listener(self):
-        try:
-            keyboard.on_press(self.application.on_key_press)
-            keyboard.wait()
-        except Exception as e:
-            print(f"DEBUG: Błąd podczas nasłuchiwania klawiszy: {e}")
