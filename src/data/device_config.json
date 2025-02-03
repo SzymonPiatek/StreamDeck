@@ -5,31 +5,17 @@
     "device_type": "Builtin",
     "macros": [
       {
-        "key": "ctrl",
-        "function": "Open app"
-      },
-      {
-        "key": "right shift",
-        "function": "Volume +"
-      },
-      {
-        "key": "command",
-        "function": "Volume -"
-      },
-      {
-        "key": "alt",
-        "function": "Toggle bar"
-      },
-      {
         "key": "shift",
-        "function": "Brightness -"
+        "function": "Open finder"
+      },
+      {
+        "key": "ctrl",
+        "function": "Lock screen"
+      },
+      {
+        "key": "",
+        "function": "Lock screen"
       }
     ]
-  },
-  {
-    "device": "Szymon Buds 2",
-    "device_id": null,
-    "device_type": "Bluetooth",
-    "macros": []
   }
 ]

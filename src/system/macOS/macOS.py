@@ -26,20 +26,28 @@ class MacOS(System):
         self.application = application
 
         self.functions = [
+            # Audio
             {"name": "Volume +", "function": self.volume_up},
             {"name": "Volume -", "function": self.volume_down},
             {"name": "Mute/Unmute", "function": self.mute_unmute},
+            # Apple Music
+            {"name": "Toggle Apple music", "function": self.toggle_apple_music},
+            {"name": "Next track Apple music", "function": self.next_track_apple_music},
+            {"name": "Previous track Apple music", "function": self.previous_track_apple_music},
+            # Spotify
+            {"name": "Toggle Spotify", "function": self.toggle_spotify},
+            {"name": "Next track spotify", "function": self.next_track_spotify},
+            {"name": "Previous track spotify", "function": self.previous_track_spotify},
+            {"name": "Open Spotify", "function": self.open_spotify},
+            # Brightness
             {"name": "Brightness +", "function": self.increase_brightness},
             {"name": "Brightness -", "function": self.decrease_brightness},
+            # Utils
             {"name": "Toggle bar", "function": self.toggle_bar},
-            {"name": "Open app", "function": self.open_app},
-            {"name": "Open url", "function": self.open_url},
-            {"name": "Toggle music", "function": self.toggle_music},
-            {"name": "Next track", "function": self.next_track},
-            {"name": "Previous track", "function": self.previous_track},
-            {"name": "Toggle Spotify", "function": self.toggle_spotify},
-            {"name": "Next track spotify", "function": self.next_spotify},
-            {"name": "Previous track spotify", "function": self.previous_spotify},
+            {"name": "Open calculator", "function": self.open_calculator},
+            {"name": "Open terminal", "function": self.open_terminal},
+            {"name": "Open google chrome", "function": self.open_google_chrome},
+            {"name": "Open finder", "function": self.open_finder},
         ]
 
     def get_active_input_device(self):
@@ -209,74 +217,45 @@ class MacOS(System):
         keyboard.hook(on_key_press)
         return
 
+    @handle_subprocess_error
+    def open_app(self, app_name):
+        subprocess.run(["open", "-a", app_name], check=True)
+
+    @handle_subprocess_error
+    def open_url(self, url):
+        subprocess.run(["open", url], check=True)
+
+    @handle_subprocess_error
+    def execture_osascript(self, command):
+        subprocess.run(["osascript", "-e", command], check=False)
+
     # Audio
-    @handle_subprocess_error
     def volume_up(self):
-        subprocess.run(
-            ["osascript", "-e", "set volume output volume (output volume of (get volume settings) + 5) --100 max"],
-            check=True,
+        self.execture_osascript(
+            command="set volume output volume (output volume of (get volume settings) + 5) --100 max"
         )
 
-    @handle_subprocess_error
     def volume_down(self):
-        subprocess.run(
-            ["osascript", "-e", "set volume output volume (output volume of (get volume settings) - 5) --100 max"],
-            check=True,
+        self.execture_osascript(
+            command="set volume output volume (output volume of (get volume settings) - 5) --100 max"
         )
 
-    @handle_subprocess_error
     def mute_unmute(self):
-        subprocess.run(
-            [
-                "osascript",
-                "-e",
-                """
+        self.execture_osascript(
+            command="""
             set currentMute to output muted of (get volume settings)
             if currentMute then
                 set volume output muted false
             else
                 set volume output muted true
             end if
-        """,
-            ],
-            check=True,
+        """
         )
 
-    # Brightness
-    @handle_subprocess_error
-    def increase_brightness(self):
-        subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 144'], check=True)
-
-    @handle_subprocess_error
-    def decrease_brightness(self):
-        subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 145'], check=True)
-
-    # Do not disturb
-    @handle_subprocess_error
-    def toggle_bar(self):
-        script = """
-        tell application "System Events"
-            tell process "ControlCenter"
-                click menu bar item 1 of menu bar 1
-            end tell
-        end tell
-        """
-        subprocess.run(["osascript", "-e", script], check=True)
-
-    # Apps
-    @handle_subprocess_error
-    def open_app(self, app_name):
-        subprocess.run(["open", "-a", app_name], check=True)
-
-    # Urls
-    @handle_subprocess_error
-    def open_url(self, url):
-        subprocess.run(["open", url], check=True)
-
     # Apple Music
-    @handle_subprocess_error
-    def toggle_music(self):
-        script = """
+    def toggle_apple_music(self):
+        self.execture_osascript(
+            command="""
         tell application "Music"
             if player state is playing then
                 pause
@@ -285,20 +264,18 @@ class MacOS(System):
             end if
         end tell
         """
-        subprocess.run(["osascript", "-e", script], check=True)
+        )
 
-    @handle_subprocess_error
-    def next_track(self):
-        subprocess.run(["osascript", "-e", 'tell application "Music" to next track'], check=True)
+    def next_track_apple_music(self):
+        self.execture_osascript(command='tell application "Music" to next track')
 
-    @handle_subprocess_error
-    def previous_track(self):
-        subprocess.run(["osascript", "-e", 'tell application "Music" to previous track'], check=True)
+    def previous_track_apple_music(self):
+        self.execture_osascript(command='tell application "Music" to previous track')
 
     # Spotify
-    @handle_subprocess_error
     def toggle_spotify(self):
-        script = """
+        self.execture_osascript(
+            command="""
         tell application "Spotify"
             if player state is playing then
                 pause
@@ -307,12 +284,44 @@ class MacOS(System):
             end if
         end tell
         """
-        subprocess.run(["osascript", "-e", script], check=True)
+        )
 
-    @handle_subprocess_error
-    def next_spotify(self):
-        subprocess.run(["osascript", "-e", 'tell application "Spotify" to next track'], check=True)
+    def next_track_spotify(self):
+        self.execture_osascript(command='tell application "Spotify" to next track')
 
-    @handle_subprocess_error
-    def previous_spotify(self):
-        subprocess.run(["osascript", "-e", 'tell application "Spotify" to previous track'], check=True)
+    def previous_track_spotify(self):
+        self.execture_osascript(command='tell application "Spotify" to previous track')
+
+    # Brightness
+    def increase_brightness(self):
+        self.execture_osascript(command='tell application "System Events" to key code 144')
+
+    def decrease_brightness(self):
+        self.execture_osascript(command='tell application "System Events" to key code 145')
+
+    # Sidebar (calendar, battery lvl etc.)
+    def toggle_bar(self):
+        self.execture_osascript(
+            command="""
+        tell application "System Events"
+            tell process "ControlCenter"
+                click menu bar item 1 of menu bar 1
+            end tell
+        end tell
+        """
+        )
+
+    def open_calculator(self):
+        self.open_app("Calculator")
+
+    def open_terminal(self):
+        self.open_app("Terminal")
+
+    def open_google_chrome(self):
+        self.open_app("Google Chrome")
+
+    def open_spotify(self):
+        self.open_app("Spotify")
+
+    def open_finder(self):
+        self.open_app("Finder")
